@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEVIL MAY CRY 5 PROGRESS TRACKER</title>
+    <style>
+        :root {
+            --dmc-red: #d32f2f;
+            --dmc-red-glow: #ff4c4c;
+            --dmc-blue: #1976d2;
+            --rank-s: #00e5ff; 
+            --surface: rgba(20, 20, 20, 0.85);
+            --border-color: #444;
+            --text-main: #f5f5f5;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Impact, Tahoma, sans-serif;
+            color: var(--text-main);
+            /* This points to the image you will upload to GitHub */
+            background: url('DMC 5.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+        }
+
+        .overlay {
+            background-color: rgba(10, 10, 10, 0.85);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--dmc-red);
+        }
+
+        h1 {
+            color: var(--dmc-red);
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(211, 47, 47, 0.5);
+            margin-bottom: 5px;
+        }
+        
+        .subtitle { color: #ccc; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        .progress-wrapper {
+            position: relative;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 4px;
+            height: 35px;
+            width: 100%;
+            margin: 25px 0 10px 0;
+            border: 1px solid var(--border-color);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b0000, var(--dmc-red-glow));
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-shadow: 2px 2px 4px #000;
+            pointer-events: none;
+        }
+
+        .controls { display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; }
+        
+        button {
+            background-color: rgba(0,0,0,0.6);
+            color: var(--dmc-red);
+            border: 1px solid var(--dmc-red);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+        button:hover { background-color: var(--dmc-red); color: #fff; box-shadow: 0 0 10px rgba(211, 47, 47, 0.5); }
+
+        .difficulty-section { margin-bottom: 15px; }
+        
+        .difficulty-header {
+            background: linear-gradient(90deg, rgba(30,30,30,0.9), rgba(10,10,10,0.9));
+            padding: 15px 20px;
+            color: var(--text-main);
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            border-left: 5px solid var(--dmc-red);
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+        }
+        .difficulty-header:hover { border-left-color: var(--dmc-red-glow); background: rgba(40,40,40,0.9); }
+
+        .mission-grid {
+            display: none; 
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+            padding: 15px 0;
+        }
+
+        .difficulty-section.active .mission-grid { display: grid; }
+        .difficulty-section.active .difficulty-header { border-left-color: var(--rank-s); }
+
+        .mission-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--surface);
+            padding: 12px 15px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .mission-name { font-size: 1.1rem; font-weight: bold; letter-spacing: 0.5px; }
+
+        select.rank-select {
+            background-color: #000;
+            color: #fff;
+            border: 1px solid var(--border-color);
+            padding: 5px 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            font-style: italic;
+            border-radius: 3px;
+            cursor: pointer;
+            outline: none;
+            width: 60px;
+            text-align: center;
+        }
+        select.rank-select:focus { border-color: var(--dmc-red-glow); }
+        
+        .rank-S { color: var(--rank-s) !important; border-color: var(--rank-s) !important; text-shadow: 0 0 5px rgba(0, 229, 255, 0.5); }
+        .rank-A { color: var(--dmc-red-glow) !important; }
+        .rank-B { color: #ffeb3b !important; }
+        .rank-C { color: #4caf50 !important; }
+        .rank-D { color: #9e9e9e !important; }
+
+        .secret-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            background-color: #000;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .secret-checkbox:checked { background-color: var(--dmc-red); border-color: var(--dmc-red-glow); }
+        .secret-checkbox:checked::after { content: "✓"; color: #fff; font-weight: bold; font-size: 16px; }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.6rem; }
+            .mission-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="overlay">
+    <div class="container">
+        <header>
+            <h1>DEVIL MAY CRY 5 PROGRESS TRACKER</h1>
+            <div class="subtitle">Special Edition Completionist Dashboard</div>
+            
+            <div class="progress-wrapper">
+                <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-text" id="progressText">0 / 138 (0%)</div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <span style="font-size: 0.8rem; color: #aaa;">Click a difficulty to expand</span>
+            <button id="clearBtn">Purge All Data</button>
+        </div>
+
+        <main id="trackerContainer"></main>
+
+        <div class="difficulty-section active" style="margin-top: 30px;">
+            <div class="difficulty-header" style="border-left-color: var(--dmc-blue);" onclick="this.parentElement.classList.toggle('active')">
+                <span>Secret Missions</span>
+                <span>▼</span>
+            </div>
+            <div class="mission-grid" id="secretContainer"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const trackerContainer = document.getElementById('trackerContainer');
+    const secretContainer = document.getElementById('secretContainer');
+    
+    const difficulties = ['Human', 'Devil Hunter', 'Son of Sparda', 'Dante Must Die', 'Heaven or Hell', 'Hell and Hell'];
+    const storyTitles = ["Prologue", "Mission 01", "Mission 02", "Mission 03", "Mission 04", "Mission 05", "Mission 06", "Mission 07", "Mission 08", "Mission 09", "Mission 10", "Mission 11", "Mission 12", "Mission 13", "Mission 14", "Mission 15", "Mission 16", "Mission 17", "Mission 18", "Mission 19", "Mission 20"];
+
+    let htmlContent = "";
+
+    difficulties.forEach((diff, dIndex) => {
+        htmlContent += `
+        <div class="difficulty-section ${dIndex === 0 ? 'active' : ''}">
+            <div class="difficulty-header" onclick="this.parentElement.classList.toggle('active')">
+                <span>${diff}</span>
+                <span>▼</span>
+            </div>
+            <div class="mission-grid">`;
+            
+        storyTitles.forEach((title, mIndex) => {
+            const id = `rank-${dIndex}-${mIndex}`;
+            htmlContent += `
+            <div class="mission-item">
+                <div class="mission-name">${title}</div>
+                <select class="rank-select storage-item" id="${id}">
+                    <option value="">-</option>
+                    <option value="S">S</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                </select>
+            </div>`;
+        });
+        htmlContent += `</div></div>`;
+    });
+    trackerContainer.innerHTML = htmlContent;
+
+    let secretHtml = "";
+    for (let i = 1; i <= 12; i++) {
+        const id = `secret-${i}`;
+        secretHtml += `
+        <label class="mission-item" style="cursor: pointer;">
+            <div class="mission-name">Secret Mission ${i < 10 ? '0'+i : i}</div>
+            <input type="checkbox" class="secret-checkbox storage-item" id="${id}">
+        </label>`;
+    }
+    secretContainer.innerHTML = secretHtml;
+
+    const allInputs = document.querySelectorAll('.storage-item');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const totalGoals = 138; 
+
+    const updateSelectColor = (select) => {
+        select.className = `rank-select storage-item rank-${select.value}`;
+    };
+
+    const calculateProgress = () => {
+        let completed = 0;
+        
+        allInputs.forEach(input => {
+            if (input.tagName === 'SELECT' && input.value !== "") completed++;
+            if (input.tagName === 'INPUT' && input.checked) completed++;
+        });
+
+        const percent = Math.round((completed / totalGoals) * 100);
+        
+        progressFill.style.width = percent + '%';
+        progressText.textContent = `${completed} / ${totalGoals} (${percent}%)`;
+
+        if (percent === 100) {
+            progressFill.style.background = 'linear-gradient(90deg, #ff8c00, #ffd700)';
+            progressText.style.color = '#000';
+            progressText.textContent = 'SSS RANK ACHIEVED - 100%';
+        } else {
+            progressFill.style.background = 'linear-gradient(90deg, #8b0000, var(--dmc-red-glow))';
+            progressText.style.color = '#fff';
+        }
+    };
+
+    allInputs.forEach(input => {
+        const saved = localStorage.getItem(input.id);
+        
+        if (input.tagName === 'SELECT') {
+            if (saved) input.value = saved;
+            updateSelectColor(input);
+            input.addEventListener('change', (e) => {
+                localStorage.setItem(e.target.id, e.target.value);
+                updateSelectColor(e.target);
+                calculateProgress();
+            });
+        } else {
+            if (saved === 'true') input.checked = true;
+            input.addEventListener('change', (e) => {
+                localStorage.setItem(e.target.id, e.target.checked);
+                calculateProgress();
+            });
+        }
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+        if(confirm("Wipe all tracking data?")) {
+            allInputs.forEach(input => {
+                if (input.tagName === 'SELECT') {
+                    input.value = "";
+                    updateSelectColor(input);
+                } else {
+                    input.checked = false;
+                }
+                localStorage.removeItem(input.id);
+            });
+            calculateProgress();
+        }
+    });
+
+    calculateProgress();
+</script>
+</body>
+</html>
